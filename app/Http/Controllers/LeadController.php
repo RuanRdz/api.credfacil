@@ -15,7 +15,7 @@ class LeadController extends Controller {
     $telefone = $request->input('email');
     $vendedor = $request->input('responsavel_nome');
 
-    $lead = Lead::create([
+    $uid = Lead::create([
       'telefone' => $telefone
       , 'vendedor' => $vendedor
       , 'data' => now()
@@ -24,7 +24,7 @@ class LeadController extends Controller {
     // Retorna resposta JSON
     return response()->json([
       'success' => true,
-      'lead' => $lead
+      'lead' => $uid['uuid']
     ], 201);
   }
 }
