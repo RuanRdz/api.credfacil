@@ -20,21 +20,27 @@ class LeadController extends Controller {
 
       $telefone = $request->input('email');
       $vendedor = $request->input('responsavel_nome');
-      $email = $request->input('responsavel_email');
-      $dataHoje = now()->toDateString();
+      if(!empty($vendedor)) {
+        $email = $request->input('responsavel_email');
+        $dataHoje = now()->toDateString();
 
-      $oVendedor = new VendedorController();
-      $uidVendedor = $oVendedor->store($vendedor, $email);
+        $oVendedor = new VendedorController();
+        $uidVendedor = $oVendedor->store($vendedor, $email);
 
-      $uid = Lead::updateOrCreate(
-        ['telefone' => $telefone, 'data' => $dataHoje],
-        ['vendedor_uuid' => $uidVendedor]
-      );
-
-      return response()->json([
-        'success' => true,
-        'lead' => $uid->uuid
-      ], 201);
+        $uid = Lead::updateOrCreate(
+          ['telefone' => $telefone, 'data' => $dataHoje],
+          ['vendedor_uuid' => $uidVendedor]
+        );
+        return response()->json([
+          'success' => true,
+          'lead' => $uid->uuid
+        ], 201);
+      } else {
+        return response()->json([
+          'success' => true,
+          'lead' => 0
+        ], 201);
+      }
     } catch (Exception $e) {
       Log::error('Erro ao armazenar lead', [
         'exception' => $e->getMessage(),
