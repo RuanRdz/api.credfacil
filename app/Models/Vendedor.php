@@ -2,15 +2,14 @@
 
 namespace App\Models;
 use Illuminate\Support\Carbon;
-
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
 
-class Lead extends Model {
+class Vendedor extends Model {
+  protected $table = 'vendedores';
   protected $fillable = [
-    'telefone'
-    , 'vendedor_uuid'
-    , 'data'
+    'nome'
+    , 'email'
   ];
 
   public $timestamps = true;
@@ -20,7 +19,7 @@ class Lead extends Model {
     static::creating(function ($model) {
       $model->uuid = (string) Str::uuid();
     });
-  }
+  }  
 
   public function setCreatedAtAttribute($value) {
     $this->attributes['created_at'] = Carbon::parse($value)->setTimezone('America/Sao_Paulo');
