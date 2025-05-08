@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Lead;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\VendedorController;
 use Illuminate\Support\Str;
 
 class LeadController extends Controller {
@@ -14,26 +15,16 @@ class LeadController extends Controller {
 
     $telefone = $request->input('email');
     $vendedor = $request->input('responsavel_nome');
+    $email = $request->input('responsavel_email');
     $dataHoje = now()->toDateString();
 
-    // Verifica se já existe
-    $leadExistente = Lead::where('telefone', $telefone)
-                          ->whereDate('data', $dataHoje)
-                          ->first();
+    $oVendedor = new VendedorController();
+    $uidVendedor = $oVendedor->store($vendedor, $email);
 
-    if ($leadExistente) {
-      return response()->json([
-        'success' => true,
-        'lead' => $leadExistente->uuid
-      ], 409); // 409 Conflict
-    }
-
-    $uid = Lead::create([
-      'telefone' => $telefone,
-      'vendedor' => $vendedor,
-      'data' => $dataHoje,
-      'uuid' => Str::uuid()
-    ]);
+    $uid = Lead::updateOrCreate(
+      ['telefone' => $telefone, 'data' => $dataHoje]
+      , ['vendedor_uuid' => $uidVendedor]
+    );
 
     return response()->json([
       'success' => true,
