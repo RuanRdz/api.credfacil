@@ -45,8 +45,16 @@ class ImportarPropostas extends Command {
 
       
       if ($response->failed()) {
-        $this->error('Erro na chamada da API.');
-        Log::info('Erro ao buscar propostas');
+        $status = $response->status();
+        $body = $response->body();
+        
+        $this->error("Erro na chamada da API. Status: $status");
+        
+        Log::error('Erro ao buscar propostas da API', [
+          'status' => $status,
+          'body' => $body
+        ]);
+        
         return;
       }
 
