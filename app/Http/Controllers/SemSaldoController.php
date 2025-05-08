@@ -24,7 +24,7 @@ class SemSaldoController extends Controller {
     // Retorna resposta JSON
     return response()->json([
       'success' => true,
-      'semSaldo' => $uid
+      'semSaldo' => $uid['uuid']
     ], 201);
   }
 }

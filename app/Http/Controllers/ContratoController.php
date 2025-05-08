@@ -24,7 +24,7 @@ class ContratoController extends Controller {
     // Retorna resposta JSON
     return response()->json([
       'success' => true,
-      'contrato' => $uid
+      'contrato' => $uid['uuid']
     ], 201);
   }
 }

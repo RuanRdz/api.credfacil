@@ -25,7 +25,7 @@ class SimulacaoMiniController extends Controller {
     // Retorna resposta JSON
     return response()->json([
       'success' => true,
-      'simulacao' => $uid
+      'simulacao' => $uid['uuid']
     ], 201);
   }
 }
