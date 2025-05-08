@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\CheckPrioraToken;
+use Illuminate\Console\Scheduling\Schedule;
 
 $oApp = Application::configure(basePath: dirname(__DIR__))
   ->withRouting(
@@ -16,6 +17,13 @@ $oApp = Application::configure(basePath: dirname(__DIR__))
   })
   ->withExceptions(function (Exceptions $exceptions) {
     //
-  })->create();
+  })
+  ->withSchedule(function (Schedule $schedule) {
+    $schedule->command('importar:propostas')->everyMinute();
+  })
+  ->withCommands([
+    \App\Console\Commands\ImportarPropostas::class,
+  ])
+  ->create();
 
 return $oApp;

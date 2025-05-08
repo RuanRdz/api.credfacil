@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\Lead;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\VendedorController;
-use Illuminate\Support\Str;
 
 class LeadController extends Controller {
   public function store(Request $request) {
