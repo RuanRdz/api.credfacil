@@ -9,10 +9,13 @@ class VendedorController extends Controller {
     $alias = strtolower(trim($nome));
     $aVendedorUuid = VendedorAlias::whereRaw('LOWER(alias) = ?', [$alias])->first();
     if (!$aVendedorUuid) {
-      $aVendedor = Vendedor::create([
+      $aVendedor = [
         'nome' => $nome
-        , 'email' => $email
-      ]);
+      ];
+      if(!empty($email)) {
+        $aVendedor['email'] = $email;
+      }
+      $aVendedor = Vendedor::create($aVendedor);
 
       $aVendedorUuid = VendedorAlias::create([
         'vendedor_uuid' => $aVendedor['uuid']
