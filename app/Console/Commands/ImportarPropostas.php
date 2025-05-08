@@ -26,7 +26,13 @@ class ImportarPropostas extends Command {
      * Execute the console command.
      */
     public function handle() {
-      $response = Http::post(env('API_URL') . '/api/propostas/', [
+      $response = Http::withHeaders([
+        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+        'Accept' => 'application/json, text/plain, */*',
+        'Accept-Language' => 'pt-BR,pt;q=0.9',
+        'Referer' => env('API_URL'),
+        'Origin' => env('API_URL'),
+      ])->post(env('API_URL') . '/api/propostas/', [
         'auth' => [
           'username' => env('API_USERNAME'),
           'password' => env('API_PASSWORD'),
@@ -42,7 +48,6 @@ class ImportarPropostas extends Command {
           ],
         ],
       ]);
-
       
       if ($response->failed()) {
         $status = $response->status();
