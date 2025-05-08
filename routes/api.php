@@ -13,8 +13,4 @@ use App\Http\Controllers\ContratoController;
 
 Route::middleware('check.priora')->group(function () {
   Route::post('/leads', [LeadController::class, 'store']);
-  Route::post('/simulacaoMaster', [SimulacaoMasterController::class, 'store']);
-  Route::post('/simulacaoMini', [SimulacaoMiniController::class, 'store']);
-  Route::post('/semSaldo', [SemSaldoController::class, 'store']);
-  Route::post('/contrato', [ContratoController::class, 'store']);
 });
