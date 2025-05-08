@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Date;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,6 +20,5 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
       date_default_timezone_set(config('app.timezone'));
-      Date::setSerializedFormat('Y-m-d\TH:i:sP');
     }
 }
