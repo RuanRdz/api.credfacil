@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Providers;
-use Illuminate\Support\Carbon;
+
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -17,8 +17,8 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void {
-      date_default_timezone_set('America/Sao_Paulo');
-      Carbon::setTimezone('America/Sao_Paulo');
+    public function boot(): void
+    {
+      date_default_timezone_set(config('app.timezone'));
     }
 }
