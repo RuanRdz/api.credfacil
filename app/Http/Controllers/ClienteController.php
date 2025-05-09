@@ -75,4 +75,11 @@ class ClienteController extends Controller {
       ]
     );
   }
+
+  public function storeFromApi($aCliente) {
+    Cliente::updateOrCreate(
+      ['cpf' => $aCliente['cpf']],
+      $aCliente
+    );
+  }
 }
