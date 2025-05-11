@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\NewcorbanConsulta;
+use App\Models\NewCorbanConsulta;
 
-class NewcorbanConsultaController extends Controller {
+class NewCorbanConsultaController extends Controller {
   public function store($data) {
-    NewcorbanConsulta::updateOrCreate(['api_id' => $data['id']], [
+    NewCorbanConsulta::updateOrCreate(['api_id' => $data['id']], [
       'api_id' => $data['id']
       , 'tipo' => $data['tipo']
       , 'api_created_at' => $data['created_at']
@@ -15,7 +15,7 @@ class NewcorbanConsultaController extends Controller {
   }
 
   public function get($apiId)   {
-    $consulta = NewcorbanConsulta::where('api_id', $apiId)->first();
+    $consulta = NewCorbanConsulta::where('api_id', $apiId)->first();
     if ($consulta) {
       return true;
     }

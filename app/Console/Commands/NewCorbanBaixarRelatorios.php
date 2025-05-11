@@ -3,9 +3,9 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Services\NewCorbanRelatorioApiService;
-use App\Http\Controllers\NewcorbanConsultaController;
-use App\Http\Controllers\NewcorbanFgtsController;
-use App\Http\Controllers\NewcorbanQueueController;
+use App\Http\Controllers\NewCorbanConsultaController;
+use App\Http\Controllers\NewCorbanFgtsController;
+use App\Http\Controllers\NewCorbanQueueController;
 
 class NewCorbanBaixarRelatorios extends Command {
   protected $signature = 'newcorban:baixar';
@@ -14,24 +14,24 @@ class NewCorbanBaixarRelatorios extends Command {
   public function handle(NewCorbanRelatorioApiService $api) {
     try {
       $relatorios = $api->buscarRelatorios();
-      $oNewcorbanConsultaController = new NewcorbanConsultaController();
+      $oNewCorbanConsultaController = new NewCorbanConsultaController();
       foreach ($relatorios as $rel) {
-        if(!$oNewcorbanConsultaController->get($rel['id'])) {
+        if(!$oNewCorbanConsultaController->get($rel['id'])) {
           $fileContent = $api->baixarRelatorio($rel['id']);
           if(!empty($fileContent)) {
             switch($rel['tipo']) {
               case 'saldos_fgts':
                 $this->info(sprintf('salvando [%s, %s]', $rel['id'], $rel['tipo']));
-                $oNewcorbanFgtsController = new NewcorbanFgtsController();
-                if($oNewcorbanFgtsController->store($rel['id'], $fileContent)) {
-                  $oNewcorbanConsultaController->store($rel);
+                $oNewCorbanFgtsController = new NewCorbanFgtsController();
+                if($oNewCorbanFgtsController->store($rel['id'], $fileContent)) {
+                  $oNewCorbanConsultaController->store($rel);
                 }
                 break;
               case 'queue_fgts':
                 $this->info(sprintf('salvando [%s, %s]', $rel['id'], $rel['tipo']));
-                $oNewcorbanQueueController = new NewcorbanQueueController();
-                if($oNewcorbanQueueController->store($rel['id'], $fileContent)) {
-                  $oNewcorbanConsultaController->store($rel);
+                $oNewCorbanQueueController = new NewCorbanQueueController();
+                if($oNewCorbanQueueController->store($rel['id'], $fileContent)) {
+                  $oNewCorbanConsultaController->store($rel);
                 }
                 break;
             }

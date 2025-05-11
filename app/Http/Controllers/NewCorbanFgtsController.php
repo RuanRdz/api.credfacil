@@ -10,7 +10,7 @@ use Exception;
 class NewCorbanFgtsController extends Controller {
   public function store($id, $csvDataBase64) {
     try {
-      NewcorbanFgts::deleted(['consulta_id' => $id]);
+      NewCorbanFgts::deleted(['consulta_id' => $id]);
 
       $csvData = base64_decode($csvDataBase64);
       $lines = explode("\n", $csvData);
@@ -48,7 +48,7 @@ class NewCorbanFgtsController extends Controller {
           'proposta_cancelada' => isset($data['Proposta Cancelada']) && $data['Proposta Cancelada'] !== '' ? \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $data['Proposta Cancelada']) : null,
           'proposta_paga'      => isset($data['Proposta Paga']) && $data['Proposta Paga'] !== '' ? \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $data['Proposta Paga']) : null,
         ];
-        NewcorbanFgts::create($payload);
+        NewCorbanFgts::create($payload);
       }
       return true;
     } catch (Exception $e) {
