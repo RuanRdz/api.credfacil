@@ -30,25 +30,33 @@ class NewCorbanFgtsController extends Controller {
         }
 
         $data = array_combine($headers, str_getcsv(implode(';', $row), ';'));
-        
+
+        $dataConsulta = Carbon::createFromFormat('d/m/Y H:i:s', $data['Data da Consulta']);
+        $dataConsultaFormatada = $dataConsulta->format('Y-m-d');
+        $cpfFormatado = Util::formatCpf($data['CPF']);
 
         $oVendedor = new VendedorController();
         $vendedorUuid = $oVendedor->store($data['Usuario']);
         $payload = [
           'consulta_id'        => $id,
           'vendedor_uuid'      => $vendedorUuid,
-          'cpf'                => Util::formatCpf($data['CPF']),
+          'cpf'                => $cpfFormatado,
+          'data'               => $dataConsultaFormatada,
           'saldo'              => $this->parseDecimal($data['Saldo']),
           'valor_liberado'     => $this->parseDecimal($data['Valor Liberado']),
           'tabela_simulada'    => empty($data['Tabela Simulada']) ? null : $data['Tabela Simulada'],
-          'data_consulta'      => \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $data['Data da Consulta']),
-          'ultima_tentativa'   => \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $data['Última Tentativa']),
+          'data_consulta'      => $dataConsulta,
+          'ultima_tentativa'   => Carbon::createFromFormat('d/m/Y H:i:s', $data['Última Tentativa']),
           'flag'               => empty($data['Flag']) ? null : $data['Flag'],
           'proposta_gerada'    => Util::parseDataBr(empty($data['Proposta Gerada']) ? null : $data['Proposta Gerada']),
-          'proposta_cancelada' => isset($data['Proposta Cancelada']) && $data['Proposta Cancelada'] !== '' ? \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $data['Proposta Cancelada']) : null,
-          'proposta_paga'      => isset($data['Proposta Paga']) && $data['Proposta Paga'] !== '' ? \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $data['Proposta Paga']) : null,
+          'proposta_cancelada' => isset($data['Proposta Cancelada']) && $data['Proposta Cancelada'] !== '' ? Carbon::createFromFormat('d/m/Y H:i:s', $data['Proposta Cancelada']) : null,
+          'proposta_paga'      => isset($data['Proposta Paga']) && $data['Proposta Paga'] !== '' ? Carbon::createFromFormat('d/m/Y H:i:s', $data['Proposta Paga']) : null,
         ];
-        NewCorbanFgts::create($payload);
+
+        NewCorbanFgts::updateOrCreate(
+          ['cpf' => $cpfFormatado, 'data' => $dataConsultaFormatada], 
+          $payload
+        );
       }
       return true;
     } catch (Exception $e) {
