@@ -20,9 +20,15 @@ $oApp = Application::configure(basePath: dirname(__DIR__))
   })
   ->withSchedule(function (Schedule $schedule) {
     $schedule->command('importar:propostas')->everyMinute();
+    $schedule->command('newcorban:gerarsaldofgts')->everyMinute();
+    $schedule->command('newcorban:gerarqueuefgts')->everyMinute();
+    $schedule->command('newcorban:baixar')->everyMinute();
   })
   ->withCommands([
     \App\Console\Commands\ImportarPropostas::class,
+    \App\Console\Commands\NewCorbanGerarRelatorioSaldoFgts::class,
+    \App\Console\Commands\NewCorbanGerarRelatorioQueueFgts::class,
+    \App\Console\Commands\NewCorbanBaixarRelatorios::class,
   ])
   ->create();
 
