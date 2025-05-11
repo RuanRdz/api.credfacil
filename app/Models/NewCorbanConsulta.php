@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
-class NewcorbanConsulta extends Model {
+class NewCorbanConsulta extends Model {
   protected $table = 'newcorban_consultas';
 
   protected $fillable = [

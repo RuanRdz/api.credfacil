@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\NewcorbanQueue;
+use App\Models\NewCorbanQueue;
 use Illuminate\Support\Carbon;
 use Exception;
 
-class NewcorbanQueueController extends Controller {
+class NewCorbanQueueController extends Controller {
   public function store($id, $csvDataBase64) {
     try {
-      NewcorbanQueue::deleted(['consulta_id' => $id]);
+      NewCorbanQueue::deleted(['consulta_id' => $id]);
 
       $csvData = base64_decode($csvDataBase64);
       $lines = explode("\n", $csvData);
@@ -37,7 +37,7 @@ class NewcorbanQueueController extends Controller {
           'valor_liberado' => Util::parseDecimal($data['Valor Liberado']),
           'data_consulta' => \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $data['Data Conclusão'])
         ];
-        NewcorbanQueue::create($payload);
+        NewCorbanQueue::create($payload);
       }
       return true;
     } catch (Exception $e) {
