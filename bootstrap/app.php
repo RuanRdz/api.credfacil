@@ -25,8 +25,8 @@ $oApp = Application::configure(basePath: dirname(__DIR__))
     $schedule->command('newcorban:gerarsaldofgts')->cron('0 * * * *');
     // Executa a cada hora no minuto 1 (ex: 01:01, 02:01, etc.)
     $schedule->command('newcorban:gerarqueuefgts')->cron('1 * * * *');
-    // Executa a cada hora no minuto 10 (ex: 01:10, 02:10, etc.)
-    $schedule->command('newcorban:baixar')->cron('10 * * * *');
+    // Executa a cada hora no minuto 2 (ex: 01:02, 02:02, etc.)
+    $schedule->command('newcorban:baixar')->cron('2 * * * *');
   })
   ->withCommands([
     \App\Console\Commands\ImportarPropostas::class,
