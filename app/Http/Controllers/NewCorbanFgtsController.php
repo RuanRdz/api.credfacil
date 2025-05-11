@@ -31,7 +31,7 @@ class NewCorbanFgtsController extends Controller {
 
         $data = array_combine($headers, str_getcsv(implode(';', $row), ';'));
 
-        $dataConsulta = Carbon::createFromFormat('d/m/Y H:i:s', $data['Data da Consulta']);
+        $dataConsulta = Carbon::createFromFormat('d/m/Y H:i:s', $data['Última Tentativa']);
         $dataConsultaFormatada = $dataConsulta->format('Y-m-d');
         $cpfFormatado = Util::formatCpf($data['CPF']);
 
@@ -45,8 +45,8 @@ class NewCorbanFgtsController extends Controller {
           'saldo'              => $this->parseDecimal($data['Saldo']),
           'valor_liberado'     => $this->parseDecimal($data['Valor Liberado']),
           'tabela_simulada'    => empty($data['Tabela Simulada']) ? null : $data['Tabela Simulada'],
-          'data_consulta'      => $dataConsulta,
-          'ultima_tentativa'   => Carbon::createFromFormat('d/m/Y H:i:s', $data['Última Tentativa']),
+          'data_consulta'      => Carbon::createFromFormat('d/m/Y H:i:s', $data['Data da Consulta']),
+          'ultima_tentativa'   => $dataConsulta,
           'flag'               => empty($data['Flag']) ? null : $data['Flag'],
           'proposta_gerada'    => Util::parseDataBr(empty($data['Proposta Gerada']) ? null : $data['Proposta Gerada']),
           'proposta_cancelada' => isset($data['Proposta Cancelada']) && $data['Proposta Cancelada'] !== '' ? Carbon::createFromFormat('d/m/Y H:i:s', $data['Proposta Cancelada']) : null,
