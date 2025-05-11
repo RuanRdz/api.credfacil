@@ -28,16 +28,26 @@ class NewCorbanQueueController extends Controller {
           continue;
         }
         $data = array_combine($headers, str_getcsv(implode(';', $row), ';'));
+
+        $dataConsulta = Carbon::createFromFormat('d/m/Y H:i:s', $data['Data Conclusão']);
+        $dataConsultaFormatada = $dataConsulta->format('Y-m-d');
+        $cpfFormatado = Util::formatCpf($data['CPF']);
+
         $payload = [
           'consulta_id' => $id,
-          'cpf' => Util::formatCpf($data['CPF']),
+          'cpf' => $cpfFormatado,
+          'data' => $dataConsultaFormatada,
           'status' => empty($data['Status']) ? null : $data['Status'],
           'telefone' => empty($data['Telefone']) ? null : $data['Telefone'],
           'saldo' => Util::parseDecimal($data['Saldo']),
           'valor_liberado' => Util::parseDecimal($data['Valor Liberado']),
-          'data_consulta' => \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $data['Data Conclusão'])
+          'data_consulta' => $dataConsulta
         ];
-        NewCorbanQueue::create($payload);
+        
+        NewCorbanQueue::updateOrCreate(
+          ['cpf' => $cpfFormatado, 'data' => $dataConsultaFormatada], 
+          $payload
+        );
       }
       return true;
     } catch (Exception $e) {
