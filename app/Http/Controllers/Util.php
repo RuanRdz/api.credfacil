@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Carbon\Carbon;
 
 class Util extends Controller {
   public static function formatCpf($cpf) {
@@ -15,5 +16,22 @@ class Util extends Controller {
   public static function parseDecimal($value) {
     $numeric = preg_replace('/[^\d,]/', '', $value);
     return $numeric === '' ? 0 : floatval(str_replace(',', '.', $numeric));
+  }
+
+  public static function parseDataBr($value) {
+    if (!$value || trim($value) === '') {
+      return null;
+    }
+    if (str_contains($value, '31/12/1969')) {
+        return null;
+    }
+    foreach (['d/m/Y H:i:s', 'd/m/Y'] as $format) {
+      try {
+        return Carbon::createFromFormat($format, $value);
+      } catch (\Exception $e) {
+        continue;
+      }
+    }
+    return null;
   }
 }
