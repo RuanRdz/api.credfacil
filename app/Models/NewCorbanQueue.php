@@ -10,6 +10,7 @@ class NewCorbanQueue extends Model {
   protected $fillable = [
     'consulta_id',
     'cpf',
+    'data',
     'status',
     'telefone',
     'saldo',
