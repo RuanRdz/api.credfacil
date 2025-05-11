@@ -19,10 +19,14 @@ $oApp = Application::configure(basePath: dirname(__DIR__))
     //
   })
   ->withSchedule(function (Schedule $schedule) {
+    //executa a cada minuto
     $schedule->command('importar:propostas')->everyMinute();
-    $schedule->command('newcorban:gerarsaldofgts')->everyMinute();
-    $schedule->command('newcorban:gerarqueuefgts')->everyMinute();
-    $schedule->command('newcorban:baixar')->everyMinute();
+    // Executa a cada hora em ponto (ex: 01:00, 02:00, etc.)
+    $schedule->command('newcorban:gerarsaldofgts')->cron('0 * * * *');
+    // Executa a cada hora no minuto 1 (ex: 01:01, 02:01, etc.)
+    $schedule->command('newcorban:gerarqueuefgts')->cron('1 * * * *');
+    // Executa a cada hora no minuto 10 (ex: 01:10, 02:10, etc.)
+    $schedule->command('newcorban:baixar')->cron('10 * * * *');
   })
   ->withCommands([
     \App\Console\Commands\ImportarPropostas::class,
