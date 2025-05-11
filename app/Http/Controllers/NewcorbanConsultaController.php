@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\NewcorbanConsulta;
+
+class NewcorbanConsultaController extends Controller {
+  public function store($data) {
+    NewcorbanConsulta::updateOrCreate(['api_id' => $data['id']], [
+      'api_id' => $data['id']
+      , 'tipo' => $data['tipo']
+      , 'api_created_at' => $data['created_at']
+      , 'api_finished_at' => $data['finished_at']
+    ]);
+  }
+
+  public function get($apiId)   {
+    $consulta = NewcorbanConsulta::where('api_id', $apiId)->first();
+    if ($consulta) {
+      return true;
+    }
+    return false;
+  }
+}

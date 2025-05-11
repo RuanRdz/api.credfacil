@@ -61,7 +61,7 @@ class ClienteController extends Controller {
       [ 'telefone' => $telefone ]
       , [
         'nome' => $nome
-        , 'cpf' => $cpf
+        , 'cpf' => Util::formatCpf($cpf)
         , 'mes' => $mes
         , 'uf' => $uf
         , 'vendedor' => $vendedor
@@ -77,6 +77,7 @@ class ClienteController extends Controller {
   }
 
   public function storeFromApi($aCliente) {
+    $aCliente['cpf'] = Util::formatCpf($aCliente['cpf']);
     Cliente::updateOrCreate(
       ['cpf' => $aCliente['cpf']],
       $aCliente
