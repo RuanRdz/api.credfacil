@@ -10,6 +10,7 @@ class NewCorbanFgts extends Model {
   protected $fillable = [
     'consulta_id',
     'cpf',
+    'data',
     'saldo',
     'valor_liberado',
     'tabela_simulada',
