@@ -57,11 +57,17 @@ class ClienteController extends Controller {
     $entrada = $dados['chat_created'] ?? null;
     $ultimaInteracao = $dados['datetime_post'] ?? null;
 
+    $sCpfFormatado = Util::formatCpf($cpf);
+    $key = ['telefone' => $telefone];
+    if(!empty($sCpfFormatado)) {
+      $key = ['cpf' => $sCpfFormatado];
+    }
+
     Cliente::updateOrCreate(
-      [ 'telefone' => $telefone ]
+      $key
       , [
         'nome' => $nome
-        , 'cpf' => Util::formatCpf($cpf)
+        , 'cpf' => $sCpfFormatado
         , 'mes' => $mes
         , 'uf' => $uf
         , 'vendedor' => $vendedor
