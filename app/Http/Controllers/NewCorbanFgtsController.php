@@ -37,26 +37,53 @@ class NewCorbanFgtsController extends Controller {
 
         $oVendedor = new VendedorController();
         $vendedorUuid = $oVendedor->store($data['Usuario']);
+
+        $conditions = [
+          'cpf'  => $cpfFormatado,
+          'data' => $dataConsultaFormatada,
+        ];
+
+        $novoValor = $this->parseDecimal($data['Valor Liberado']);
+        $situacao = !empty($data['Flag']) ?? null;
+
         $payload = [
           'consulta_id'        => $id,
           'vendedor_uuid'      => $vendedorUuid,
           'cpf'                => $cpfFormatado,
           'data'               => $dataConsultaFormatada,
           'saldo'              => $this->parseDecimal($data['Saldo']),
-          'valor_liberado'     => $this->parseDecimal($data['Valor Liberado']),
+          'valor_liberado'     => $novoValor,
           'tabela_simulada'    => empty($data['Tabela Simulada']) ? null : $data['Tabela Simulada'],
           'data_consulta'      => Carbon::createFromFormat('d/m/Y H:i:s', $data['Data da Consulta']),
           'ultima_tentativa'   => $dataConsulta,
-          'flag'               => empty($data['Flag']) ? null : $data['Flag'],
+          'flag'               => $situacao,
           'proposta_gerada'    => Util::parseDataBr(empty($data['Proposta Gerada']) ? null : $data['Proposta Gerada']),
           'proposta_cancelada' => isset($data['Proposta Cancelada']) && $data['Proposta Cancelada'] !== '' ? Carbon::createFromFormat('d/m/Y H:i:s', $data['Proposta Cancelada']) : null,
           'proposta_paga'      => isset($data['Proposta Paga']) && $data['Proposta Paga'] !== '' ? Carbon::createFromFormat('d/m/Y H:i:s', $data['Proposta Paga']) : null,
         ];
+        
+        $registroExistente = NewCorbanFgts::where($conditions)->first();
+        $deveAtualizar = false;
+        if (!$registroExistente) {
+          $deveAtualizar = true; // Se não existir, cria novo
+        } elseif ($situacao !== null) {
+          $deveAtualizar = true; // Se tiver flag diferente de null (ou seja, não é "Consultado"), atualiza sempre
+        } else {
+          $novoValor = $this->parseDecimal($data['Valor Liberado']);
+          $valorAtual = $registroExistente->valor_liberado ?? 0;
+          if ($novoValor > $valorAtual) {
+            $deveAtualizar = true; // É "Consultado", então só atualiza se o novo valor for maior
+          }
+        }
 
-        NewCorbanFgts::updateOrCreate(
-          ['cpf' => $cpfFormatado, 'data' => $dataConsultaFormatada], 
-          $payload
-        );
+        if ($deveAtualizar) {
+          NewCorbanFgts::updateOrCreate(
+            $conditions, 
+            $payload
+          );
+        }
+
+        
       }
       return true;
     } catch (Exception $e) {
