@@ -42,6 +42,7 @@ class NewCorbanBaixarRelatorios extends Command {
       }
     } catch (\Exception $e) {
       $this->error("Erro: " . $e->getMessage());
+      throw($e);
     }
   }
 }
