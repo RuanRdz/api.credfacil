@@ -36,21 +36,42 @@ class NewCorbanQueueController extends Controller {
         $dataConsultaFormatada = $dataConsulta->format('Y-m-d');
         $cpfFormatado = Util::formatCpf($data['CPF']);
 
-        $payload = [
-          'consulta_id' => $id,
-          'cpf' => $cpfFormatado,
+        $conditions = [
+          'cpf'  => $cpfFormatado,
           'data' => $dataConsultaFormatada,
-          'status' => empty($data['Status']) ? null : $data['Status'],
-          'telefone' => empty($data['Telefone']) ? null : $data['Telefone'],
-          'saldo' => Util::parseDecimal($data['Saldo']),
-          'valor_liberado' => Util::parseDecimal($data['Valor Liberado']),
-          'data_consulta' => $dataConsulta
         ];
-        
-        NewCorbanQueue::updateOrCreate(
-          ['cpf' => $cpfFormatado, 'data' => $dataConsultaFormatada], 
-          $payload
-        );
+
+        $novoValor = Util::parseDecimal($data['Valor Liberado']);
+        $status = !empty($data['Status']) ?? null;
+
+        $payload = [
+          'consulta_id'     => $id,
+          'cpf'             => $cpfFormatado,
+          'data'            => $dataConsultaFormatada,
+          'status'          => $status,
+          'telefone'        => empty($data['Telefone']) ? null : $data['Telefone'],
+          'saldo'           => Util::parseDecimal($data['Saldo']),
+          'valor_liberado'  => $novoValor,
+          'data_consulta'   => $dataConsulta,
+        ];
+
+        $registroExistente = NewCorbanQueue::where($conditions)->first();
+        $deveAtualizar = false;
+        if (!$registroExistente) {
+          $deveAtualizar = true; // novo registro
+        } elseif ($status !== 'Consultado') {
+          $deveAtualizar = true; // sempre atualiza se não for "Consultado"
+        } else {
+          $novoValor = Util::parseDecimal($data['Valor Liberado']);
+          $valorAtual = $registroExistente->valor_liberado ?? 0;
+          if ($novoValor > $valorAtual) {
+            $deveAtualizar = true; // atualiza apenas se valor maior
+          }
+        }
+
+        if ($deveAtualizar) {
+          NewCorbanQueue::updateOrCreate($conditions, $payload);
+        }
       }
       return true;
     } catch (Exception $e) {
