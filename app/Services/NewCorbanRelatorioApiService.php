@@ -67,7 +67,7 @@ class NewCorbanRelatorioApiService {
 
     $response = Http::asForm()
       ->withHeaders($this->getAuthHeader())
-      ->post("{$this->baseUrl}/system/{$tipo}.php?action=export", [
+      ->post("{$this->baseUrl}/system/queue_fgts.php?action=export", [
         'filters[startDate]' => $hoje,
         'filters[endDate]' => $hoje,
         'tipo' => $tipo,

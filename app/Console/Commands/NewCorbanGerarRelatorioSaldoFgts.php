@@ -10,7 +10,7 @@ class NewCorbanGerarRelatorioSaldoFgts extends Command {
 
   public function handle(NewCorbanRelatorioApiService $api) {
     try {
-      $retorno = $api->gerarRelatorio('saldo_fgts');
+      $retorno = $api->gerarRelatorio('saldos_fgts');
       $this->info("{$this->signature} -> [$retorno]");
     } catch (\Exception $e) {
       $this->error(json_encode([

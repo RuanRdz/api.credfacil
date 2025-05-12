@@ -27,8 +27,11 @@ class NewCorbanQueueController extends Controller {
         if (count($row) < count($headers)) {
           continue;
         }
+        #consulta ainda não foi concluída
+        if(empty($data['Data Conclusão'])) {
+          continue;
+        }
         $data = array_combine($headers, str_getcsv(implode(';', $row), ';'));
-
         $dataConsulta = Carbon::createFromFormat('d/m/Y H:i:s', $data['Data Conclusão']);
         $dataConsultaFormatada = $dataConsulta->format('Y-m-d');
         $cpfFormatado = Util::formatCpf($data['CPF']);
@@ -52,7 +55,6 @@ class NewCorbanQueueController extends Controller {
       return true;
     } catch (Exception $e) {
       throw($e);
-      return false;
     }
   }
 }
