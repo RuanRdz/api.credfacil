@@ -10,8 +10,6 @@ use Exception;
 class NewCorbanFgtsController extends Controller {
   public function store($id, $csvDataBase64) {
     try {
-      NewCorbanFgts::deleted(['consulta_id' => $id]);
-
       $csvData = base64_decode($csvDataBase64);
       $lines = explode("\n", $csvData);
 
@@ -44,7 +42,6 @@ class NewCorbanFgtsController extends Controller {
         ];
 
         $novoValor = $this->parseDecimal($data['Valor Liberado']);
-        $situacao = $data['Flag'] ?? null;
 
         $payload = [
           'consulta_id'        => $id,
@@ -56,7 +53,7 @@ class NewCorbanFgtsController extends Controller {
           'tabela_simulada'    => empty($data['Tabela Simulada']) ? null : $data['Tabela Simulada'],
           'data_consulta'      => Carbon::createFromFormat('d/m/Y H:i:s', $data['Data da Consulta']),
           'ultima_tentativa'   => $dataConsulta,
-          'flag'               => $situacao,
+          'flag'               => $data['Flag'] ?? null,
           'proposta_gerada'    => Util::parseDataBr(empty($data['Proposta Gerada']) ? null : $data['Proposta Gerada']),
           'proposta_cancelada' => isset($data['Proposta Cancelada']) && $data['Proposta Cancelada'] !== '' ? Carbon::createFromFormat('d/m/Y H:i:s', $data['Proposta Cancelada']) : null,
           'proposta_paga'      => isset($data['Proposta Paga']) && $data['Proposta Paga'] !== '' ? Carbon::createFromFormat('d/m/Y H:i:s', $data['Proposta Paga']) : null,
@@ -66,7 +63,7 @@ class NewCorbanFgtsController extends Controller {
         $deveAtualizar = false;
         if (!$registroExistente) {
           $deveAtualizar = true; // Se não existir, cria novo
-        } elseif ($situacao !== null) {
+        } elseif ($registroExistente->situacao !== null) {
           $deveAtualizar = true; // Se tiver flag diferente de null (ou seja, não é "Consultado"), atualiza sempre
         } else {
           $novoValor = $this->parseDecimal($data['Valor Liberado']);
