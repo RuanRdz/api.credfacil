@@ -40,13 +40,12 @@ class NewCorbanQueueController extends Controller {
         ];
 
         $novoValor = Util::parseDecimal($data['Valor Liberado']);
-        $status = $data['Status'] ?? null;
 
         $payload = [
           'consulta_id'     => $id,
           'cpf'             => $cpfFormatado,
           'data'            => $dataConsultaFormatada,
-          'status'          => $status,
+          'status'          => $data['Status'] ?? null,
           'telefone'        => empty($data['Telefone']) ? null : $data['Telefone'],
           'saldo'           => Util::parseDecimal($data['Saldo']),
           'valor_liberado'  => $novoValor,
@@ -57,7 +56,7 @@ class NewCorbanQueueController extends Controller {
         $deveAtualizar = false;
         if (!$registroExistente) {
           $deveAtualizar = true; // novo registro
-        } elseif ($status !== 'Consultado') {
+        } elseif ($registroExistente->status !== 'Consultado') {
           $deveAtualizar = true; // sempre atualiza se não for "Consultado"
         } else {
           $novoValor = Util::parseDecimal($data['Valor Liberado']);
