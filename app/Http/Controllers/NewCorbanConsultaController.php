@@ -21,4 +21,8 @@ class NewCorbanConsultaController extends Controller {
     }
     return false;
   }
+
+  public function delete($apiId)   {
+    NewCorbanConsulta::where('api_id', $apiId)->delete() > 0;
+  }
 }

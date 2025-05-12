@@ -9,8 +9,6 @@ use Exception;
 class NewCorbanQueueController extends Controller {
   public function store($id, $csvDataBase64) {
     try {
-      NewCorbanQueue::deleted(['consulta_id' => $id]);
-
       $csvData = base64_decode($csvDataBase64);
       $lines = explode("\n", $csvData);
 
