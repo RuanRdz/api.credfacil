@@ -22,7 +22,8 @@ class PropostaController extends Controller {
 
     $oVendedor = new VendedorController();
     $aProposta['vendedor_uuid'] = $oVendedor->store($aProposta['vendedor_nome']);
-
+    $aProposta['cpf'] = Util::formatCpf($aProposta['cpf']);
+    
     $proposta = Proposta::updateOrCreate(
       ['proposta_id' => $aProposta['proposta_id']],
       $aProposta
