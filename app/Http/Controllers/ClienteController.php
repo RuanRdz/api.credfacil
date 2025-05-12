@@ -84,6 +84,10 @@ class ClienteController extends Controller {
 
   public function storeFromApi($aCliente) {
     $aCliente['cpf'] = Util::formatCpf($aCliente['cpf']);
+    #se nao mandou o telefone, nao atualiza, para evitar sobrepor dados
+    if(empty($aCliente['telefone'])) {
+      unset($aCliente['telefone']);
+    }
     Cliente::updateOrCreate(
       ['cpf' => $aCliente['cpf']],
       $aCliente
