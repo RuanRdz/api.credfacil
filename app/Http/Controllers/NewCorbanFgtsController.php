@@ -44,7 +44,7 @@ class NewCorbanFgtsController extends Controller {
         ];
 
         $novoValor = $this->parseDecimal($data['Valor Liberado']);
-        $situacao = !empty($data['Flag']) ?? null;
+        $situacao = $data['Flag'] ?? null;
 
         $payload = [
           'consulta_id'        => $id,
@@ -61,7 +61,7 @@ class NewCorbanFgtsController extends Controller {
           'proposta_cancelada' => isset($data['Proposta Cancelada']) && $data['Proposta Cancelada'] !== '' ? Carbon::createFromFormat('d/m/Y H:i:s', $data['Proposta Cancelada']) : null,
           'proposta_paga'      => isset($data['Proposta Paga']) && $data['Proposta Paga'] !== '' ? Carbon::createFromFormat('d/m/Y H:i:s', $data['Proposta Paga']) : null,
         ];
-        
+
         $registroExistente = NewCorbanFgts::where($conditions)->first();
         $deveAtualizar = false;
         if (!$registroExistente) {

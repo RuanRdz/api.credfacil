@@ -42,7 +42,7 @@ class NewCorbanQueueController extends Controller {
         ];
 
         $novoValor = Util::parseDecimal($data['Valor Liberado']);
-        $status = !empty($data['Status']) ?? null;
+        $status = $data['Status'] ?? null;
 
         $payload = [
           'consulta_id'     => $id,
