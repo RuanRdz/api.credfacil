@@ -14,6 +14,9 @@ class NewCorbanBaixarRelatorios extends Command {
   public function handle(NewCorbanRelatorioApiService $api) {
     try {
       $relatorios = $api->buscarRelatorios();
+      usort($relatorios, function ($a, $b) {
+        return intval($a['id']) <=> intval($b['id']);
+      });
       $oNewCorbanConsultaController = new NewCorbanConsultaController();
       foreach ($relatorios as $rel) {
         if(!$oNewCorbanConsultaController->get($rel['id'])) {
