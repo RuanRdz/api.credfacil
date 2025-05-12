@@ -53,7 +53,7 @@ class NewCorbanFgtsController extends Controller {
           'tabela_simulada'    => empty($data['Tabela Simulada']) ? null : $data['Tabela Simulada'],
           'data_consulta'      => Carbon::createFromFormat('d/m/Y H:i:s', $data['Data da Consulta']),
           'ultima_tentativa'   => $dataConsulta,
-          'flag'               => $data['Flag'] ?? null,
+          'flag'               => empty($data['Flag']) ? null : $data['Flag'],
           'proposta_gerada'    => Util::parseDataBr(empty($data['Proposta Gerada']) ? null : $data['Proposta Gerada']),
           'proposta_cancelada' => isset($data['Proposta Cancelada']) && $data['Proposta Cancelada'] !== '' ? Carbon::createFromFormat('d/m/Y H:i:s', $data['Proposta Cancelada']) : null,
           'proposta_paga'      => isset($data['Proposta Paga']) && $data['Proposta Paga'] !== '' ? Carbon::createFromFormat('d/m/Y H:i:s', $data['Proposta Paga']) : null,

@@ -45,7 +45,7 @@ class NewCorbanQueueController extends Controller {
           'consulta_id'     => $id,
           'cpf'             => $cpfFormatado,
           'data'            => $dataConsultaFormatada,
-          'status'          => $data['Status'] ?? null,
+          'status'          => empty($data['Status']) ? null : $data['Status'],
           'telefone'        => empty($data['Telefone']) ? null : $data['Telefone'],
           'saldo'           => Util::parseDecimal($data['Saldo']),
           'valor_liberado'  => $novoValor,
