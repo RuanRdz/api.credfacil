@@ -11,6 +11,8 @@ class NewCorbanFgtsController extends Controller {
   public function store($id, $csvDataBase64) {
     try {
       $csvData = base64_decode($csvDataBase64);
+      // Remove o BOM do início da string (caso exista)
+      $csvData = preg_replace('/^\xEF\xBB\xBF/', '', $csvData);
       $lines = explode("\n", $csvData);
 
       // Garante que a primeira linha é uma string
