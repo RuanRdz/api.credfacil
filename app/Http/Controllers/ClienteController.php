@@ -66,7 +66,8 @@ class ClienteController extends Controller {
     Cliente::updateOrCreate(
       $key
       , [
-        'nome' => $nome
+        'telefone' => $telefone
+        , 'nome' => $nome
         , 'cpf' => $sCpfFormatado
         , 'mes' => $mes
         , 'uf' => $uf
