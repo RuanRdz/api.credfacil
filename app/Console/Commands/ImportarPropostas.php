@@ -66,7 +66,24 @@ class ImportarPropostas extends Command {
       
       Log::error('Erro ao buscar propostas da API', [
         'status' => $status,
-        'body' => $body
+        'body' => $body,
+        'param' => [
+          'url' => env('API_URL') . '/api/propostas/',
+          'auth' => [
+            'username' => env('API_USERNAME'),
+            'password' => env('API_PASSWORD'),
+            'empresa'  => env('API_EMPRESA'),
+          ],
+          'requestType' => 'getPropostas',
+          'filters' => [
+            'status' => [],
+            'data' => [
+              'tipo' => 'cadastro',
+              'startDate' => $dataInicio,
+              'endDate' => $dataFim,
+            ],
+          ],
+        ],
       ]);
       
       return;
