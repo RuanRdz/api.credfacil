@@ -1,7 +1,6 @@
 <?php
 namespace App\Services;
 
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Carbon;
 
@@ -76,6 +75,8 @@ class NewCorbanRelatorioApiService {
         'filters[endDate]' => $fim,
         'tipo' => $tipo,
       ]);
+
+    
 
     $response->throw();
 
