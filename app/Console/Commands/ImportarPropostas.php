@@ -14,7 +14,7 @@ class ImportarPropostas extends Command {
    *
    * @var string
    */
-  protected $signature = 'importar:propostas';
+  protected $signature = 'importar:propostas {inicio?} {fim?}';
 
   /**
    * The console command description.
@@ -27,6 +27,14 @@ class ImportarPropostas extends Command {
    * Execute the console command.
    */
   public function handle() {
+    $dataInicio = now()->toDateString();
+    $dataFim = now()->toDateString();
+    $dataInicioParam = $this->argument('inicio');
+    $dataFimParam = $this->argument('fim');
+    if(!empty($dataInicioParam) && !empty($dataFimParam)) {
+      $dataInicio = $dataInicioParam;
+      $dataFim = $dataFimParam;
+    }
     $response = Http::withHeaders([
       'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
       'Accept' => 'application/json, text/plain, */*',
@@ -44,8 +52,8 @@ class ImportarPropostas extends Command {
         'status' => [],
         'data' => [
           'tipo' => 'cadastro',
-          'startDate' => now()->toDateString(),
-          'endDate' => now()->toDateString(),
+          'startDate' => $dataInicio,
+          'endDate' => $dataFim,
         ],
       ],
     ]);
@@ -71,6 +79,12 @@ class ImportarPropostas extends Command {
     foreach ($dados as $idProposta => $proposta) {
       $ddd = $proposta['cliente']['telefones'][array_key_first($proposta['cliente']['telefones'])]['ddd'] ?? null;
       $telefone = $proposta['cliente']['telefones'][array_key_first($proposta['cliente']['telefones'])]['numero'] ?? null;
+      if(!empty($telefone)) {
+        $telefone = str_pad($telefone, 9, '9', STR_PAD_LEFT);
+      }
+      if(!empty($ddd)) {
+        $ddd = str_pad($ddd, 4, '5', STR_PAD_LEFT);
+      }
 
       $data = Carbon::parse($proposta['cliente']['nascimento']);
       $mes = ucfirst(self::traduzMesInglesParaPortugues($data->translatedFormat('F')));
@@ -87,7 +101,8 @@ class ImportarPropostas extends Command {
         , 'telefone' => $ddd.$telefone
         , 'status' => $proposta['api']['status_api']
         , 'cliente' => [
-            'nome' => $proposta['cliente']['cliente_nome']
+          'telefone' => $ddd.$telefone
+          , 'nome' => $proposta['cliente']['cliente_nome']
           , 'cpf' => $proposta['cliente']['cliente_cpf']
           , 'mes' => $mes
           , 'uf' => $proposta['cliente']['endereco']['estado']
