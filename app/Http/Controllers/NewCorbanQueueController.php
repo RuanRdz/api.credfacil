@@ -10,7 +10,7 @@ class NewCorbanQueueController extends Controller {
   public function store($id, $csvDataBase64) {
     try {
       $csvData = base64_decode($csvDataBase64);
-      $csvData = preg_replace('/^\xEF\xBB\xBF/', '', $csvData);
+      #$csvData = preg_replace('/^\xEF\xBB\xBF/', '', $csvData);
       $lines = explode("\n", $csvData);
 
       // Garante que a primeira linha é uma string
@@ -26,11 +26,11 @@ class NewCorbanQueueController extends Controller {
         if (count($row) < count($headers)) {
           continue;
         }
+        $data = array_combine($headers, str_getcsv(implode(';', $row), ';'));
         #consulta ainda não foi concluída
         if(empty($data['Data Conclusão'])) {
           continue;
         }
-        $data = array_combine($headers, str_getcsv(implode(';', $row), ';'));
         $dataConsulta = Carbon::createFromFormat('d/m/Y H:i:s', $data['Data Conclusão']);
         $dataConsultaFormatada = $dataConsulta->format('Y-m-d');
         $cpfFormatado = Util::formatCpf($data['CPF']);
@@ -73,6 +73,7 @@ class NewCorbanQueueController extends Controller {
       }
       return true;
     } catch (Exception $e) {
+      var_dump($e);
       throw($e);
     }
   }
