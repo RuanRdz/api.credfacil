@@ -61,15 +61,19 @@ class NewCorbanRelatorioApiService {
     ];
   }
 
-  public function gerarRelatorio($tipo) {
+  public function gerarRelatorio($tipo, $inicio = null, $fim = null) {
     $this->login();
-    $hoje = Carbon::now()->toDateString();
+
+    if(empty($inicio)) {
+      $inicio = Carbon::now()->toDateString();
+      $fim = Carbon::now()->toDateString();
+    }
 
     $response = Http::asForm()
       ->withHeaders($this->getAuthHeader())
       ->post("{$this->baseUrl}/system/queue_fgts.php?action=export", [
-        'filters[startDate]' => $hoje,
-        'filters[endDate]' => $hoje,
+        'filters[startDate]' => $inicio,
+        'filters[endDate]' => $fim,
         'tipo' => $tipo,
       ]);
 
