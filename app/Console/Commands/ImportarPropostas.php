@@ -27,14 +27,17 @@ class ImportarPropostas extends Command {
    * Execute the console command.
    */
   public function handle() {
-    $dataInicio = now()->toDateString();
-    $dataFim = now()->toDateString();
     $dataInicioParam = $this->argument('inicio');
     $dataFimParam = $this->argument('fim');
-    if(!empty($dataInicioParam) && !empty($dataFimParam)) {
+
+    if (!empty($dataFimParam)) {
       $dataInicio = $dataInicioParam;
       $dataFim = $dataFimParam;
+    } else {
+      $dataInicio = now()->subDays(7)->toDateString();
+      $dataFim = now()->toDateString();
     }
+    
     $response = Http::withHeaders([
       'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
       'Accept' => 'application/json, text/plain, */*',
