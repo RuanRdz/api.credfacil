@@ -22,6 +22,7 @@ class NewCorbanFgts extends Model {
     'proposta_paga',
     'vendedor_uuid',
     'instituicao',
+    'robo',
   ];
 
   protected $casts = [

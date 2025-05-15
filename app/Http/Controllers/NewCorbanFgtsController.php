@@ -59,7 +59,8 @@ class NewCorbanFgtsController extends Controller {
           'proposta_gerada'    => Util::parseDataBr(empty($data['Proposta Gerada']) ? null : $data['Proposta Gerada']),
           'proposta_cancelada' => isset($data['Proposta Cancelada']) && $data['Proposta Cancelada'] !== '' ? Carbon::createFromFormat('d/m/Y H:i:s', $data['Proposta Cancelada']) : null,
           'proposta_paga'      => isset($data['Proposta Paga']) && $data['Proposta Paga'] !== '' ? Carbon::createFromFormat('d/m/Y H:i:s', $data['Proposta Paga']) : null,
-          'instituicao'        => empty($data['Instituição']) ? null : $data['Instituição']
+          'instituicao'        => empty($data['Instituição']) ? null : $data['Instituição'],
+          'robo'               => empty($data['Robô']) ? 0 : 1
         ];
 
         $registroExistente = NewCorbanFgts::where($conditions)->first();
