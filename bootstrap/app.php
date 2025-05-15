@@ -19,8 +19,10 @@ $oApp = Application::configure(basePath: dirname(__DIR__))
     //
   })
   ->withSchedule(function (Schedule $schedule) {
-    //executa a cada 15 minutos
-    $schedule->command('importar:propostas')->everyFifteenMinutes();
+    // Executa a cada 5 minutos (ex: busca dos últimos 5-10 minutos)
+    $schedule->command('importar:propostas')->everyFiveMinutes();
+    // Executa diariamente às 2h da manhã para buscar os últimos 30 dias
+    $schedule->command('importar:propostas --dias=30')->dailyAt('02:00');
     // Executa a cada hora em ponto (ex: 01:00, 02:00, etc.)
     $schedule->command('newcorban:gerarsaldofgts')->cron('0 * * * *');
     // Executa a cada hora no minuto 1 (ex: 01:01, 02:01, etc.)
