@@ -8,7 +8,8 @@ use Illuminate\Console\Scheduling\Schedule;
 
 $oApp = Application::configure(basePath: dirname(__DIR__))
   ->withRouting(
-    api: __DIR__.'/../routes/api.php'
+    api: __DIR__.'/../routes/api.php',
+    web: __DIR__.'/../routes/web.php',
   )
   ->withMiddleware(function (Middleware $middleware) {
     $middleware->alias([
