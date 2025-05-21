@@ -67,18 +67,27 @@ class NewCorbanFgtsController extends Controller {
         if (!$registroExistente) {
           NewCorbanFgts::create($payload);
         } else {
+          if($registroExistente->vendedor_uuid == env('USER_API')) {
+            $payload['vendedor_uuid'] = $vendedorUuid;
+          } else {
+            if($vendedorUuid != env('USER_API')) {
+              $payload['vendedor_uuid'] = $vendedorUuid;
+            } else {
+              unset($payload['vendedor_uuid']);
+            }
+          }
           $novoValor = $this->parseDecimal($data['Valor Liberado']);
           $valorAtual = $registroExistente->valor_liberado ?? 0;
           if ($registroExistente->situacao !== null || $novoValor > $valorAtual) {
-            NewCorbanFgts::update(
+            NewCorbanFgts::updateOrCreate(
               $conditions, 
               $payload
             );
           } else {
-            if($vendedorUuid !== env('USER_API')) {
-              NewCorbanFgts::update(
+            if(isset($payload['vendedor_uuid'])) {
+              NewCorbanFgts::updateOrCreate(
                 $conditions, 
-                $payload
+                ['vendedor_uuid' => $payload['vendedor_uuid']]
               );
             }
           }
