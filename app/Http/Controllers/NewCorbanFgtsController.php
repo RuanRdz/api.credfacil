@@ -64,27 +64,25 @@ class NewCorbanFgtsController extends Controller {
         ];
 
         $registroExistente = NewCorbanFgts::where($conditions)->first();
-        $deveAtualizar = false;
         if (!$registroExistente) {
-          $deveAtualizar = true; // Se não existir, cria novo
-        } elseif ($registroExistente->situacao !== null) {
-          $deveAtualizar = true; // Se tiver flag diferente de null (ou seja, não é "Consultado"), atualiza sempre
+          NewCorbanFgts::create($payload);
         } else {
           $novoValor = $this->parseDecimal($data['Valor Liberado']);
           $valorAtual = $registroExistente->valor_liberado ?? 0;
-          if ($novoValor > $valorAtual) {
-            $deveAtualizar = true; // É "Consultado", então só atualiza se o novo valor for maior
+          if ($registroExistente->situacao !== null || $novoValor > $valorAtual) {
+            NewCorbanFgts::update(
+              $conditions, 
+              $payload
+            );
+          } else {
+            if($vendedorUuid !== env('USER_API')) {
+              NewCorbanFgts::update(
+                $conditions, 
+                $payload
+              );
+            }
           }
         }
-
-        if ($deveAtualizar) {
-          NewCorbanFgts::updateOrCreate(
-            $conditions, 
-            $payload
-          );
-        }
-
-        
       }
       return true;
     } catch (Exception $e) {
