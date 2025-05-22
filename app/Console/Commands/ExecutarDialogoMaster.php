@@ -4,6 +4,9 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Models\NewCorbanFgts;
 use Exception;
 
 class ExecutarDialogoMaster extends Command {
@@ -12,7 +15,7 @@ class ExecutarDialogoMaster extends Command {
    *
    * @var string
    */
-  protected $signature = 'app:executar-dialogo-master';
+  protected $signature = 'guru:dialogo-master';
 
   /**
    * The console command description.
@@ -25,37 +28,49 @@ class ExecutarDialogoMaster extends Command {
    * Execute the console command.
    */
   public function handle() {
-    $aPhonesId = explode(',', env('CHATGURU_PHONE_ID'));
-    $this->info(env('CHATGURU_PHONE_ID'));
-    $this->info(json_encode($aPhonesId));
-    foreach($aPhonesId as $sPhoneId) {
-      $this->info('Executando para o phoneid:' . $sPhoneId);
+    $registros = DB::table('newcorban_fgts AS f')
+      ->join('clientes AS c', 'f.cpf', '=', 'c.cpf')
+      ->select('f.id', 'f.cpf', 'f.flag', 'c.telefone')
+      ->where('f.flag', 'MASTER')
+      ->whereNotNull('c.telefone')
+      ->get();
+
+    foreach ($registros as $r) {
       try {
         $aPayload = [
-          'chat_number' => '554799638161',
+          'chat_number' => $r->telefone,
           'key'         => env('CHATGURU_API_KEY'),
           'account_id'  => env('CHATGURU_ACCOUNT_ID'),
-          'phone_id'    => $sPhoneId,
+          'phone_id'    => env('CHATGURU_PHONE_ID'),
           'action'      => 'dialog_execute',
           'dialog_id'   => env('CHATGURU_MASTER_DIALOG_ID'),
         ];
         $response = Http::asForm()->post(env('CHATGURU_API_URL'), $aPayload);
+        $responseBody = isset($response) ? $response->body() : 'sem resposta';
 
-        if ($response->successful()) {
-          $this->info('Diálogo executado com sucesso:');
-          $this->line(json_encode($response->json(), JSON_PRETTY_PRINT));
+        $json = $response->json();
+        $foiExecutado = $response->successful()
+          && ($json['result'] ?? '') === 'success'
+          && ($json['dialog_execution_return'] ?? '') === 'Diálogo Executado';
+
+        if ($foiExecutado) {
+          NewCorbanFgts::where('id', $r->id)->update(['flag' => null]);
         } else {
-          $this->error('Erro ao executar diálogo:');
-          $this->line(json_encode($aPayload));
-          $this->line($response->body());
+          Log::info(sprintf(
+            'Erro ao executar diálogo: payload[%s]. response[%s]',
+            json_encode($aPayload),
+            $responseBody
+          ));
         }
       } catch (Exception $oExcept) {
-        $this->info('Erro ao executar diálogo:');
-        $this->line(json_encode($aPayload));
-        $this->line($response->body());
+        Log::info(sprintf(
+          'Exception ao executar diálogo: [%s]. payload[%s]. response[%s]'
+          , $oExcept->getMessage()
+          , json_encode($aPayload)
+          , $responseBody
+        ));
       }
     }
-
     return 0;
   }
 }
