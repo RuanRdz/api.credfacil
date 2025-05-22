@@ -24,6 +24,9 @@ class NewCorbanFgtsController extends Controller {
       $headers = array_map('trim', str_getcsv($headerLine, ';'));
       $rows = array_map(fn($line) => str_getcsv($line, ';'), $lines);
 
+      // Lógica de definição do vendedor
+      $userApi = env('USER_API');
+
       foreach ($rows as $row) {
         if (count($row) < count($headers)) {
           continue; // ignora linhas incompletas
@@ -44,7 +47,8 @@ class NewCorbanFgtsController extends Controller {
         ];
 
         $novoValor = $this->parseDecimal($data['Valor Liberado']);
-        if($data['Mensagem'] == 'valor da emissão da operação (issue_amount) é superior ao valor máximo permitido.') {
+        if($data['Mensagem'] == 'valor da emissão da operação (issue_amount) é superior ao valor máximo permitido.'
+          && $vendedorUuid == $userApi) {
           $data['Flag'] = 'MASTER';
         }
 
@@ -73,9 +77,6 @@ class NewCorbanFgtsController extends Controller {
           NewCorbanFgts::create($payload);
           continue;
         }
-
-        // Lógica de definição do vendedor
-        $userApi = env('USER_API');
 
         if ($vendedorUuid !== $userApi || $registroExistente->vendedor_uuid === $userApi) {
           $payload['vendedor_uuid'] = $vendedorUuid;
