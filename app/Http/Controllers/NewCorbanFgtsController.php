@@ -39,8 +39,8 @@ class NewCorbanFgtsController extends Controller {
         $vendedorUuid = $oVendedor->store($data['Usuario']);
 
         $conditions = [
-          'cpf'  => $cpfFormatado,
-          'data' => $dataConsultaFormatada,
+          'cpf'  => (string) $cpfFormatado,
+          'data' => (string) $dataConsultaFormatada,
         ];
 
         $novoValor = $this->parseDecimal($data['Valor Liberado']);
