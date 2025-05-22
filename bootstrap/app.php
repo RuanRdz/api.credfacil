@@ -21,17 +21,22 @@ $oApp = Application::configure(basePath: dirname(__DIR__))
   })
   ->withSchedule(function (Schedule $schedule) {
     // Executa a cada 5 minutos (ex: busca dos últimos 5-10 minutos)
-    $schedule->command('importar:propostas')->everyFiveMinutes();
+    $schedule->command('importar:propostas')->everyFiveMinutes()->withoutOverlapping();
+
     // Executa diariamente às 2h da manhã para buscar os últimos 30 dias
     $schedule->command('importar:propostas --dias=30')->dailyAt('02:00');
-    // Executa a cada hora em ponto (ex: 01:00, 02:00, etc.)
-    $schedule->command('newcorban:gerarsaldofgts')->cron('0 * * * *');
-    // Executa a cada hora no minuto 1 (ex: 01:01, 02:01, etc.)
-    $schedule->command('newcorban:gerarqueuefgts')->cron('1 * * * *');
-    // Executa a cada hora no minuto 2 (ex: 01:02, 02:02, etc.)
-    $schedule->command('newcorban:baixar')->cron('2 * * * *');
-    // Executa a cada hora no minuto 15
-    $schedule->command('guru:dialogo-master')->cron('15 * * * *');
+
+    // A cada 30 minutos (ex: 00:00, 00:30, 01:00, ...)
+    $schedule->command('newcorban:gerarsaldofgts')->cron('0,30 * * * *')->withoutOverlapping();
+
+    // 1 minuto depois de gerarsaldofgts
+    $schedule->command('newcorban:gerarqueuefgts')->cron('1,31 * * * *')->withoutOverlapping();
+
+    // 6 minutos depois de gerarsaldofgts
+    $schedule->command('newcorban:baixar')->cron('6,36 * * * *')->withoutOverlapping();
+
+    // 11 minutos depois de gerarsaldofgts
+    $schedule->command('guru:dialogo-master')->cron('11,41 * * * *')->withoutOverlapping();
   })
   ->withCommands([
     \App\Console\Commands\ImportarPropostas::class,
