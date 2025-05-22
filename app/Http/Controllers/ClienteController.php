@@ -56,31 +56,37 @@ class ClienteController extends Controller {
     $linkChat = $dados['link_chat'] ?? null;
     $entrada = $dados['chat_created'] ?? null;
     $ultimaInteracao = $dados['datetime_post'] ?? null;
-
     $sCpfFormatado = Util::formatCpf($cpf);
-    $key = ['telefone' => $telefone];
-    if(!empty($sCpfFormatado)) {
-      $key = ['cpf' => $sCpfFormatado];
+
+    $payLoad = [
+      'telefone' => $telefone
+      , 'nome' => $nome
+      , 'cpf' => $sCpfFormatado
+      , 'mes' => $mes
+      , 'uf' => $uf
+      , 'vendedor' => $vendedor
+      , 'tipo' => $tipo
+      , 'antecipou' => $antecipou
+      , 'acompanhamento' => $acompanhamento
+      , 'entrada' => $entrada
+      , 'ultima_interacao' => $ultimaInteracao
+      , 'link_chat' => $linkChat
+      , 'trafego' => $trafego
+    ];
+    
+    $oCliente = Cliente::where(['cpf' => $sCpfFormatado]);
+    if(!$oCliente) {
+      if(empty($payLoad['cpf'])) {
+        unset($payLoad['cpf']);
+      }
+      $oCliente = Cliente::where(['telefone' => $telefone]);  
     }
 
-    Cliente::updateOrCreate(
-      $key
-      , [
-        'telefone' => $telefone
-        , 'nome' => $nome
-        , 'cpf' => $sCpfFormatado
-        , 'mes' => $mes
-        , 'uf' => $uf
-        , 'vendedor' => $vendedor
-        , 'tipo' => $tipo
-        , 'antecipou' => $antecipou
-        , 'acompanhamento' => $acompanhamento
-        , 'entrada' => $entrada
-        , 'ultima_interacao' => $ultimaInteracao
-        , 'link_chat' => $linkChat
-        , 'trafego' => $trafego
-      ]
-    );
+    if($oCliente) {
+      $oCliente->update($payLoad);
+    } else {
+      Cliente::create($payLoad);
+    }
   }
 
   public function storeFromApi($aCliente) {
