@@ -44,6 +44,9 @@ class NewCorbanFgtsController extends Controller {
         ];
 
         $novoValor = $this->parseDecimal($data['Valor Liberado']);
+        if($data['Mensagem'] == 'valor da emissão da operação (issue_amount) é superior ao valor máximo permitido.') {
+          $data['Flag'] = 'MASTER';
+        }
 
         $payload = [
           'consulta_id'        => $id,
@@ -78,7 +81,7 @@ class NewCorbanFgtsController extends Controller {
           }
           $novoValor = $this->parseDecimal($data['Valor Liberado']);
           $valorAtual = $registroExistente->valor_liberado ?? 0;
-          if ($registroExistente->situacao !== null || $novoValor > $valorAtual) {
+          if ($registroExistente->flag !== null || $novoValor > $valorAtual) {
             NewCorbanFgts::updateOrCreate(
               $conditions, 
               $payload
