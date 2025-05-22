@@ -30,12 +30,15 @@ $oApp = Application::configure(basePath: dirname(__DIR__))
     $schedule->command('newcorban:gerarqueuefgts')->cron('1 * * * *');
     // Executa a cada hora no minuto 2 (ex: 01:02, 02:02, etc.)
     $schedule->command('newcorban:baixar')->cron('2 * * * *');
+    // Executa a cada hora no minuto 15
+    $schedule->command('guru:dialogo-master')->cron('15 * * * *');
   })
   ->withCommands([
     \App\Console\Commands\ImportarPropostas::class,
     \App\Console\Commands\NewCorbanGerarRelatorioSaldoFgts::class,
     \App\Console\Commands\NewCorbanGerarRelatorioQueueFgts::class,
     \App\Console\Commands\NewCorbanBaixarRelatorios::class,
+    \App\Console\Commands\ExecutarDialogoMaster::class,
   ])
   ->create();
 
