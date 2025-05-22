@@ -74,12 +74,14 @@ class ClienteController extends Controller {
       , 'trafego' => $trafego
     ];
     
-    $oCliente = Cliente::where(['cpf' => $sCpfFormatado]);
-    if(!$oCliente) {
-      if(empty($payLoad['cpf'])) {
+    // Tenta localizar pelo CPF
+    $oCliente = Cliente::where('cpf', $sCpfFormatado)->first();
+    // Se não encontrar pelo CPF, tenta pelo telefone
+    if (!$oCliente) {
+      if (empty($payLoad['cpf'])) {
         unset($payLoad['cpf']);
       }
-      $oCliente = Cliente::where(['telefone' => $telefone]);  
+      $oCliente = Cliente::where('telefone', $telefone)->first();
     }
 
     if($oCliente) {
