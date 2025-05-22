@@ -66,33 +66,48 @@ class NewCorbanFgtsController extends Controller {
           'robo'               => empty($data['Robô']) ? 0 : 1
         ];
 
+        $cpf = (string) $data['cpf'];
+        $dataFormatada = date('Y-m-d', strtotime($data['data']));
+        $valorLiberado = floatval($this->parseDecimal($data['Valor Liberado']));
+
+        $conditions = [
+          'cpf' => $cpf,
+          'data' => $dataFormatada,
+        ];
+
         $registroExistente = NewCorbanFgts::where($conditions)->first();
+
         if (!$registroExistente) {
+          // Se não existir, apenas cria
           NewCorbanFgts::create($payload);
+          return;
+        }
+
+        // Lógica de definição do vendedor
+        $userApi = env('USER_API');
+
+        if ($vendedorUuid !== $userApi || $registroExistente->vendedor_uuid === $userApi) {
+          $payload['vendedor_uuid'] = $vendedorUuid;
         } else {
-          if($registroExistente->vendedor_uuid == env('USER_API')) {
-            $payload['vendedor_uuid'] = $vendedorUuid;
-          } else {
-            if($vendedorUuid != env('USER_API')) {
-              $payload['vendedor_uuid'] = $vendedorUuid;
-            } else {
-              unset($payload['vendedor_uuid']);
-            }
+          unset($payload['vendedor_uuid']);
+        }
+
+        // Verifica se precisa atualizar
+        $valorAtual = floatval($registroExistente->valor_liberado ?? 0);
+        $deveAtualizar = $registroExistente->flag !== null || $valorLiberado > $valorAtual;
+
+        if ($deveAtualizar) {
+          // Apenas atualiza se houver diferença nos dados
+          $mudancas = array_diff_assoc($payload, $registroExistente->only(array_keys($payload)));
+          if (!empty($mudancas)) {
+            $registroExistente->update($payload);
           }
-          $novoValor = $this->parseDecimal($data['Valor Liberado']);
-          $valorAtual = $registroExistente->valor_liberado ?? 0;
-          if ($registroExistente->flag !== null || $novoValor > $valorAtual) {
-            NewCorbanFgts::updateOrCreate(
-              $conditions, 
-              $payload
-            );
-          } else {
-            if(isset($payload['vendedor_uuid'])) {
-              NewCorbanFgts::updateOrCreate(
-                $conditions, 
-                ['vendedor_uuid' => $payload['vendedor_uuid']]
-              );
-            }
+        } elseif (isset($payload['vendedor_uuid'])) {
+          // Atualiza somente o vendedor se necessário
+          if ($registroExistente->vendedor_uuid !== $payload['vendedor_uuid']) {
+            $registroExistente->update([
+              'vendedor_uuid' => $payload['vendedor_uuid'],
+            ]);
           }
         }
       }
