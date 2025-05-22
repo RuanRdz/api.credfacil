@@ -66,21 +66,12 @@ class NewCorbanFgtsController extends Controller {
           'robo'               => empty($data['Robô']) ? 0 : 1
         ];
 
-        $cpf = (string) $data['cpf'];
-        $dataFormatada = date('Y-m-d', strtotime($data['data']));
-        $valorLiberado = floatval($this->parseDecimal($data['Valor Liberado']));
-
-        $conditions = [
-          'cpf' => $cpf,
-          'data' => $dataFormatada,
-        ];
-
         $registroExistente = NewCorbanFgts::where($conditions)->first();
 
         if (!$registroExistente) {
           // Se não existir, apenas cria
           NewCorbanFgts::create($payload);
-          return;
+          continue;
         }
 
         // Lógica de definição do vendedor
@@ -94,7 +85,7 @@ class NewCorbanFgtsController extends Controller {
 
         // Verifica se precisa atualizar
         $valorAtual = floatval($registroExistente->valor_liberado ?? 0);
-        $deveAtualizar = $registroExistente->flag !== null || $valorLiberado > $valorAtual;
+        $deveAtualizar = $registroExistente->flag !== null || $novoValor > $valorAtual;
 
         if ($deveAtualizar) {
           // Apenas atualiza se houver diferença nos dados
