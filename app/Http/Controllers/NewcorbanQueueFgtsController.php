@@ -21,6 +21,7 @@ class NewcorbanQueueFgtsController extends Controller
 
   const errorConsultaNovamente = [
     'valor da emissão da operação (issue_amount) é superior ao valor máximo permitido.'
+    , '"valor da emissão da operação (issue_amount) é superior ao valor máximo permitido."'
   ];
 
   public function storeAndSend($aConsulta) {
@@ -110,7 +111,7 @@ class NewcorbanQueueFgtsController extends Controller
       $campos = $request->input('campos_personalizados');
       $sRetornoFgts = $campos['FGTS - Valor Liberado'] ?? null;
 
-      if($sRetornoFgts != self::errorConsultaNovamente) {
+      if(!in_array($sRetornoFgts, self::errorConsultaNovamente)) {
         return response()->json([
           'success' => true
           , 'message' => 'Não será consultado novamente'
