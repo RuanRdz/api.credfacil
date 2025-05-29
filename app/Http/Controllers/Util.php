@@ -38,4 +38,8 @@ class Util extends Controller {
   public static function onlyNumber(string $valor): string {
     return preg_replace('/\D/', '', $valor);
   }
+
+  public static function valueBr($valor) {
+    return 'R$ ' . number_format($valor, 2, ',', '.');
+  }
 }
