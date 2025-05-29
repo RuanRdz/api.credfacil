@@ -190,12 +190,11 @@ class NewcorbanQueueFgtsController extends Controller
       $consultaId = $request->query('id');
       $oConsulta = NewcorbanQueueFgts::where(['id' => $consultaId]);
       $oConsulta->update([
-        'saldo' => Util::parseDecimal($request->input('saldo'))
-        , 'valor_liberado' => Util::parseDecimal($request->input('valor_liberado'))
+        'saldo' => $request->input('saldo')
+        , 'valor_liberado' => $request->input('valor_liberado')
         , 'data_inclusao' => Carbon::parse($request->input('data_inclusao'))
         , 'data_ult_consulta' => Carbon::parse($request->input('data_ult_consulta'))
         , 'data_concluido' => Carbon::parse($request->input('data_concluido'))
-        , 'api' => $request->input('api')
         , 'error_message' => $request->input('error_message')
         , 'vendedor' => $request->input('vendedor')
         , 'proposta_id' => $request->input('proposta_id')
