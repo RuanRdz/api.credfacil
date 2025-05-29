@@ -35,7 +35,6 @@ return new class extends Migration {
       $table->timestamp('data_inclusao')->nullable();
       $table->timestamp('data_ult_consulta')->nullable();
       $table->timestamp('data_concluido')->nullable();
-      $table->boolean('api')->default(false);
       $table->text('error_message')->nullable();
       $table->string('vendedor')->nullable();
       $table->unsignedBigInteger('proposta_id')->nullable();
