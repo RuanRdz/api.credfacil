@@ -133,7 +133,7 @@ class NewcorbanQueueFgtsController extends Controller
           , 'tabela' => env('TABELA_BANCO')
           , 'telefone' => $aCliente['telefone']
           , 'webhook_url' => sprintf(
-            '%s?token=%sid=%s'
+            '%s?token=%s&id=%s'
             , env('WEBHOOK_URL')
             , env('NEWCORBAN_TOKEN')
             , $aConsulta['id']
