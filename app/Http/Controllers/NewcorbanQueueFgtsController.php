@@ -107,6 +107,16 @@ class NewcorbanQueueFgtsController extends Controller
       $vendedor = $request->input('responsavel_nome');
       $uidVendedor = null;
 
+      $sRetornoFgts = $dados['campos_personalizados']['FGTS - Valor Liberado'] ?? null;
+
+      if($sRetornoFgts != self::errorConsultaNovamente) {
+        return response()->json([
+          'success' => true
+          , 'message' => 'Não será consultado novamente'
+        ], 201);
+        die;
+      }
+
       //garante o cadastro do cliente
       $oCliente = new ClienteController();
       $aCliente = $oCliente->store($request);
@@ -188,10 +198,15 @@ class NewcorbanQueueFgtsController extends Controller
 
   public function storeFromNewcorban(Request $request) {
     try {
+
+      $oStatusController = new StatusController();
+      $statusId = $oStatusController->store($request->input('status_descricao'));
+
       $consultaId = $request->query('id');
       $oConsulta = NewcorbanQueueFgts::where(['id' => $consultaId]);
       $oConsulta->update([
-        'saldo' => $request->input('saldo')
+        'status_id' => $statusId
+        , 'saldo' => $request->input('saldo')
         , 'valor_liberado' => $request->input('valor_liberado')
         , 'data_inclusao' => Carbon::parse($request->input('data_inclusao'))
         , 'data_ult_consulta' => Carbon::parse($request->input('data_ult_consulta'))
