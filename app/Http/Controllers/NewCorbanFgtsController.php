@@ -47,10 +47,6 @@ class NewCorbanFgtsController extends Controller {
         ];
 
         $novoValor = $this->parseDecimal($data['Valor Liberado']);
-        if($data['Mensagem'] == 'valor da emissão da operação (issue_amount) é superior ao valor máximo permitido.'
-          && $vendedorUuid == $userApi) {
-          $data['Flag'] = 'MASTER';
-        }
 
         $payload = [
           'consulta_id'        => $id,
