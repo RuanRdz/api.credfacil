@@ -84,11 +84,14 @@ class ClienteController extends Controller {
       $oCliente = Cliente::where('telefone', $telefone)->first();
     }
 
-    if($oCliente) {
+    if ($oCliente) {
       $oCliente->update($payLoad);
+      $aCliente = $oCliente->refresh()->toArray();
     } else {
-      Cliente::create($payLoad);
+      $aCliente = Cliente::create($payLoad)->toArray();
     }
+
+    return $aCliente;
   }
 
   public function storeFromApi($aCliente) {

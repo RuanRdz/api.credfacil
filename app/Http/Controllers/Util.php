@@ -34,4 +34,8 @@ class Util extends Controller {
     }
     return null;
   }
+
+  public static function onlyNumber(string $valor): string {
+    return preg_replace('/\D/', '', $valor);
+  }
 }
