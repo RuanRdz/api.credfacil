@@ -107,7 +107,8 @@ class NewcorbanQueueFgtsController extends Controller
       $vendedor = $request->input('responsavel_nome');
       $uidVendedor = null;
 
-      $sRetornoFgts = $request->input('campos_personalizados.FGTS - Valor Liberado') ?? null;
+      $campos = $request->input('campos_personalizados');
+      $sRetornoFgts = $campos['FGTS - Valor Liberado'] ?? null;
 
       if($sRetornoFgts != self::errorConsultaNovamente) {
         return response()->json([
