@@ -11,7 +11,10 @@ use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\VendedorController;
 use App\Http\Controllers\NewCobarnApiController;
 use App\Http\Controllers\StatusController;
+use App\Http\Controllers\SlackController;
 use App\Models\NewcorbanQueueFgts;
+use App\Models\Cliente;
+use App\Models\Vendedor;
 
 class NewcorbanQueueFgtsController extends Controller
 {
@@ -22,6 +25,7 @@ class NewcorbanQueueFgtsController extends Controller
   const errorConsultaNovamente = [
     'valor da emissão da operação (issue_amount) é superior ao valor máximo permitido.'
     , '"valor da emissão da operação (issue_amount) é superior ao valor máximo permitido."'
+    , 'Valor da emissão superior ao máximo permitido'
   ];
 
   public function storeAndSend($aConsulta) {
@@ -205,7 +209,7 @@ class NewcorbanQueueFgtsController extends Controller
       $statusId = $oStatusController->store($request->input('status_descricao'));
 
       $consultaId = $request->query('id');
-      $oConsulta = NewcorbanQueueFgts::where(['id' => $consultaId]);
+      $oConsulta = NewcorbanQueueFgts::where(['id' => $consultaId])->first();
       $oConsulta->update([
         'status_id' => $statusId
         , 'saldo' => $request->input('saldo')
@@ -220,7 +224,10 @@ class NewcorbanQueueFgtsController extends Controller
         , 'data_cancelado' => $request->input('data_cancelado')
       ]);
 
-      $this->atualizaTagGuru($request->input('telefone'));
+      if($request->input('valor_liberado') > 0 || in_array($request->input('error_message'), self::errorConsultaNovamente)) {
+        $this->atualizaTagGuru($request->input('telefone'));
+        $this->notificaVendedorSlack($oConsulta->fresh());
+      }
 
       return response()->json([
         'success' => true
@@ -271,5 +278,87 @@ class NewcorbanQueueFgtsController extends Controller
         , $responseBody
       ));
     }
+  }
+
+  public function notificaVendedorSlack($oConsulta) {
+    $oVendedor = Vendedor::where(['uuid' => $oConsulta->vendedor_uuid])->first();
+    if(empty($oVendedor->slackid)) {
+      return false;
+    }
+
+    $oCliente = Cliente::where(['id' => $oConsulta->cliente_id])->first();
+
+    $aMessage = $this->getContent(
+      $oCliente->cpf
+      , $oCliente->telefone
+      , $oCliente->link_chat
+      , empty($oConsulta->valor_liberado) ? $oConsulta->error_message : Util::valueBr($oConsulta->valor_liberado)
+    );
+    $oSlackController = new SlackController();
+    $oSlackController->sendSlackMessage($oVendedor->slackid, $aMessage);
+  }
+
+  /**
+   * Monta o content para envio da notificação
+   */
+  function getContent($sCpf, $sTelefone, $sLinkChat, $sValorLiberado) {
+    $aTemplate = [
+      [
+        'type' => 'divider'
+      ],
+      [
+        'type' => 'divider'
+      ],
+      [
+        'type' => 'section',
+        'text' => [
+          'type' => 'mrkdwn',
+          'text' => sprintf(
+            ":star2: *Novo cliente saldo Bom*"
+          )
+        ]
+      ]
+    ];
+    $aTemplate[] = ['type' => 'divider'];
+    $aTemplate[] = [
+      'type' => 'section',
+      'fields' => [
+        [
+          'type' => 'mrkdwn',
+          'text' => sprintf(
+            "CPF: *%s*, Telefone: %s"
+            , $sCpf
+            , $sTelefone
+          )
+        ]
+      ]
+    ];
+    $aTemplate[] = [
+      'type' => 'section',
+      'fields' => [
+        [
+          'type' => 'mrkdwn',
+          'text' => sprintf(
+            "*Chat*: %s"
+            , $sLinkChat
+          )
+        ]
+      ]
+    ];
+    
+    $aTemplate[] = [
+      'type' => 'section',
+      'fields' => [
+        [
+          'type' => 'mrkdwn',
+          'text' => sprintf(
+            "*Valor liberado*: %s"
+            , $sValorLiberado
+          )
+        ]
+      ]
+    ];
+
+    return $aTemplate;
   }
 }
