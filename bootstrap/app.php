@@ -33,9 +33,6 @@ $oApp = Application::configure(basePath: dirname(__DIR__))
 
     // 6 minutos depois de gerarsaldofgts
     $schedule->command('newcorban:baixar')->cron('6,36 * * * *')->withoutOverlapping();
-
-    // 11 minutos depois de gerarsaldofgts
-    $schedule->command('guru:dialogo-master')->cron('11,41 * * * *')->withoutOverlapping();
   })
   ->withCommands([
     \App\Console\Commands\ImportarPropostas::class,
