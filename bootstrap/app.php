@@ -31,9 +31,6 @@ $oApp = Application::configure(basePath: dirname(__DIR__))
     // A cada 30 minutos (ex: 00:00, 00:30, 01:00, ...)
     $schedule->command('newcorban:gerarsaldofgts')->cron('0,30 * * * *')->withoutOverlapping();
 
-    // 1 minuto depois de gerarsaldofgts
-    $schedule->command('newcorban:gerarqueuefgts')->cron('1,31 * * * *')->withoutOverlapping();
-
     // 6 minutos depois de gerarsaldofgts
     $schedule->command('newcorban:baixar')->cron('6,36 * * * *')->withoutOverlapping();
 
