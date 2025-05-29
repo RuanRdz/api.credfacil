@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Exception;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\VendedorController;
 use App\Http\Controllers\NewCobarnApiController;
@@ -202,6 +203,8 @@ class NewcorbanQueueFgtsController extends Controller
         , 'data_cancelado' => $request->input('data_cancelado')
       ]);
 
+      $this->atualizaTagGuru($request->input('telefone'));
+
       return response()->json([
         'success' => true
         , 'consulta_id' => $consultaId
@@ -215,6 +218,41 @@ class NewcorbanQueueFgtsController extends Controller
         'success' => false,
         'message' => 'Erro ao armazenar retorno da consulta.'
       ], 500);
+    }
+  }
+
+  public function atualizaTagGuru($sTelefone) {
+    try {
+      $aPayload = [
+        'chat_number' => $sTelefone,
+        'key'         => env('CHATGURU_API_KEY'),
+        'account_id'  => env('CHATGURU_ACCOUNT_ID'),
+        'phone_id'    => env('CHATGURU_PHONE_ID'),
+        'action'      => 'dialog_execute',
+        'dialog_id'   => env('CHATGURU_MASTER_DIALOG_ID'),
+      ];
+      $response = Http::asForm()->post(env('CHATGURU_API_URL'), $aPayload);
+      $responseBody = isset($response) ? $response->body() : 'sem resposta';
+
+      $json = $response->json();
+      $foiExecutado = $response->successful()
+        && ($json['result'] ?? '') === 'success'
+        && ($json['dialog_execution_return'] ?? '') === 'Diálogo Executado';
+
+      if (!$foiExecutado) {
+        Log::error(sprintf(
+          'Erro ao executar diálogo: payload[%s]. response[%s]',
+          json_encode($aPayload),
+          $responseBody
+        ));
+      }
+    } catch (Exception $oExcept) {
+      Log::error(sprintf(
+        'Exception ao executar diálogo: [%s]. payload[%s]. response[%s]'
+        , $oExcept->getMessage()
+        , json_encode($aPayload)
+        , $responseBody
+      ));
     }
   }
 }
