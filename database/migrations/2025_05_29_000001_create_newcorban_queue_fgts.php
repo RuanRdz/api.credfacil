@@ -25,9 +25,9 @@ return new class extends Migration {
     Schema::create('newcorban_queue_fgts', function (Blueprint $table) {
       $table->id();
       $table->unsignedBigInteger('consulta_id')->nullable();
-      $table->unsignedTinyInteger('cliente_id');
+      $table->unsignedBigInteger('cliente_id');
       $table->string('tabela');
-      $table->unsignedTinyInteger('status_id');
+      $table->unsignedBigInteger('status_id');
       $table->string('vendedor_uuid')->nullable();
       $table->string('instituicao')->nullable();
       $table->decimal('saldo', 10, 2)->nullable();
