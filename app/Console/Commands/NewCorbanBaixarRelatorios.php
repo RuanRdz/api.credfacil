@@ -5,7 +5,6 @@ use Illuminate\Console\Command;
 use App\Services\NewCorbanRelatorioApiService;
 use App\Http\Controllers\NewCorbanConsultaController;
 use App\Http\Controllers\NewCorbanFgtsController;
-use App\Http\Controllers\NewCorbanQueueController;
 
 class NewCorbanBaixarRelatorios extends Command {
   protected $signature = 'newcorban:baixar {id?}';
@@ -20,6 +19,9 @@ class NewCorbanBaixarRelatorios extends Command {
       });
       $oNewCorbanConsultaController = new NewCorbanConsultaController();
       foreach ($relatorios as $rel) {
+        if($rel['tipo'] != 'saldos_fgts') {
+          continue;
+        }
         if(!empty($id)) {
           if($id != $rel['id']) {
             continue;
@@ -31,24 +33,12 @@ class NewCorbanBaixarRelatorios extends Command {
         if(!$oNewCorbanConsultaController->get($rel['id'])) {
           $fileContent = $api->baixarRelatorio($rel['id']);
           if(!empty($fileContent)) {
-            switch($rel['tipo']) {
-              case 'saldos_fgts':
-                $this->info(sprintf('salvando [%s, %s]', $rel['id'], $rel['tipo']));
-                $oNewCorbanFgtsController = new NewCorbanFgtsController();
-                if($oNewCorbanFgtsController->store($rel['id'], $fileContent)) {
-                  $oNewCorbanConsultaController->store($rel);
-                }
-                break;
-              case 'queue_fgts':
-                $this->info(sprintf('salvando [%s, %s]', $rel['id'], $rel['tipo']));
-                $oNewCorbanQueueController = new NewCorbanQueueController();
-                if($oNewCorbanQueueController->store($rel['id'], $fileContent)) {
-                  $oNewCorbanConsultaController->store($rel);
-                }
-                break;
+            $this->info(sprintf('salvando [%s, %s]', $rel['id'], $rel['tipo']));
+            $oNewCorbanFgtsController = new NewCorbanFgtsController();
+            if($oNewCorbanFgtsController->store($rel['id'], $fileContent)) {
+              $oNewCorbanConsultaController->store($rel);
             }
           }
-          
           sleep(3);
         }
       }
