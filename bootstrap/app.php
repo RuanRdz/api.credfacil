@@ -37,9 +37,7 @@ $oApp = Application::configure(basePath: dirname(__DIR__))
   ->withCommands([
     \App\Console\Commands\ImportarPropostas::class,
     \App\Console\Commands\NewCorbanGerarRelatorioSaldoFgts::class,
-    \App\Console\Commands\NewCorbanGerarRelatorioQueueFgts::class,
     \App\Console\Commands\NewCorbanBaixarRelatorios::class,
-    \App\Console\Commands\ExecutarDialogoMaster::class,
   ])
   ->create();
 
