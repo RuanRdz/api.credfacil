@@ -8,62 +8,53 @@ use Illuminate\Support\Carbon;
 use Exception;
 
 class NewCorbanFgtsController extends Controller {
-  public function store($id, $csvDataBase64) {
+  public function store($id, $csvData) {
     try {
-      $csvData = base64_decode($csvDataBase64);
       // Remove o BOM do início da string (caso exista)
       $csvData = preg_replace('/^\xEF\xBB\xBF/', '', $csvData);
       $lines = explode("\n", $csvData);
 
-      // Garante que a primeira linha é uma string
-      $headerLine = array_shift($lines);
-      if (!is_string($headerLine)) {
-        throw new \Exception("Cabeçalho CSV inválido.");
-      }
-
-      $headers = array_map('trim', str_getcsv($headerLine, ';'));
-      $rows = array_map(fn($line) => str_getcsv($line, ';'), $lines);
-
       // Lógica de definição do vendedor
       $userApi = env('USER_API');
 
-      foreach ($rows as $row) {
-        if (count($row) < count($headers)) {
+      foreach ($lines as $sRow) {
+        $row = explode(';', $sRow);
+        if(!isset($row[0]) || empty($row[0]) || $row[0] == 'Instituição') {
           continue; // ignora linhas incompletas
         }
 
-        $data = array_combine($headers, str_getcsv(implode(';', $row), ';'));
+        $data = str_getcsv(implode(';', $row), ';');
 
-        $dataConsulta = Carbon::createFromFormat('d/m/Y H:i:s', $data['Última Tentativa']);
+        $dataConsulta = Carbon::createFromFormat('d/m/Y H:i:s', $data[7]);
         $dataConsultaFormatada = $dataConsulta->format('Y-m-d');
-        $cpfFormatado = Util::formatCpf($data['CPF']);
+        $cpfFormatado = Util::formatCpf($data[2]);
 
         $oVendedor = new VendedorController();
-        $vendedorUuid = $oVendedor->store($data['Usuario']);
+        $vendedorUuid = $oVendedor->store($data[13]);
 
         $conditions = [
           'cpf'  => (string) $cpfFormatado,
           'data' => (string) $dataConsultaFormatada,
         ];
 
-        $novoValor = $this->parseDecimal($data['Valor Liberado']);
+        $novoValor = $this->parseDecimal($data[4]);
 
         $payload = [
           'consulta_id'        => $id,
           'vendedor_uuid'      => $vendedorUuid,
           'cpf'                => $cpfFormatado,
           'data'               => $dataConsultaFormatada,
-          'saldo'              => $this->parseDecimal($data['Saldo']),
+          'saldo'              => $this->parseDecimal($data[3]),
           'valor_liberado'     => $novoValor,
-          'tabela_simulada'    => empty($data['Tabela Simulada']) ? null : $data['Tabela Simulada'],
-          'data_consulta'      => Carbon::createFromFormat('d/m/Y H:i:s', $data['Data da Consulta']),
+          'tabela_simulada'    => empty($data[5]) ? null : $data[5],
+          'data_consulta'      => Carbon::createFromFormat('d/m/Y H:i:s', $data[6]),
           'ultima_tentativa'   => $dataConsulta,
-          'flag'               => empty($data['Flag']) ? null : $data['Flag'],
-          'proposta_gerada'    => Util::parseDataBr(empty($data['Proposta Gerada']) ? null : $data['Proposta Gerada']),
-          'proposta_cancelada' => isset($data['Proposta Cancelada']) && $data['Proposta Cancelada'] !== '' ? Carbon::createFromFormat('d/m/Y H:i:s', $data['Proposta Cancelada']) : null,
-          'proposta_paga'      => isset($data['Proposta Paga']) && $data['Proposta Paga'] !== '' ? Carbon::createFromFormat('d/m/Y H:i:s', $data['Proposta Paga']) : null,
-          'instituicao'        => empty($data['Instituição']) ? null : $data['Instituição'],
-          'robo'               => empty($data['Robô']) ? 0 : 1
+          'flag'               => empty($data[8]) ? null : $data[8],
+          'proposta_gerada'    => Util::parseDataBr(empty($data[10]) ? null : $data[10]),
+          'proposta_cancelada' => isset($data[11]) && $data[11] !== '' ? Carbon::createFromFormat('d/m/Y H:i:s', $data[11]) : null,
+          'proposta_paga'      => isset($data[12]) && $data[12] !== '' ? Carbon::createFromFormat('d/m/Y H:i:s', $data[12]) : null,
+          'instituicao'        => empty($data[0]) ? null : $data[0],
+          'robo'               => empty($data[1]) ? 0 : 1
         ];
 
         $registroExistente = NewCorbanFgts::where($conditions)->first();

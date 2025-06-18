@@ -117,8 +117,16 @@ class NewCorbanRelatorioApiService {
 
     $response->throw();
 
-    if(!empty($response->json('fileName'))) {
-      return $response->json('fileContent');
+    $data = $response->json();
+
+    if (!empty($data['s3_url'])) {
+      // Baixa diretamente o conteúdo do arquivo CSV do S3
+      $csvResponse = Http::get($data['s3_url']);
+      $csvResponse->throw();
+
+      return $csvResponse->body(); // retorna o conteúdo do CSV como string
     }
+
+    return null;
   }
 }
