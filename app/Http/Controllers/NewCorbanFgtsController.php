@@ -19,7 +19,7 @@ class NewCorbanFgtsController extends Controller {
 
       foreach ($lines as $sRow) {
         $row = explode(';', $sRow);
-        if(!isset($row[0]) || empty($row[0]) || $row[0] == 'Instituição') {
+        if(!isset($row[0]) || empty($row[0]) || $row[0] == 'Instituição' || empty(trim($sRow))) {
           continue; // ignora linhas incompletas
         }
 
