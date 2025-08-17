@@ -37,6 +37,12 @@
                             {{ __('Perfil') }}
                         </x-dropdown-link>
 
+                        @role('admin')
+                        <x-dropdown-link :href="route('users.index')">
+                            {{ __('Usuários') }}
+                        </x-dropdown-link>
+                        @endrole
+
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

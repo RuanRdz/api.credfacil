@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClienteSemSaldoController;
 use App\Http\Controllers\LogViewerController;
+use App\Http\Controllers\Admin\UserController;
 
 Route::get('/', function () {
   return redirect()->route('clientes.sem.saldo');
@@ -21,6 +22,10 @@ Route::middleware('auth')->group(function () {
   Route::get('/clientes-sem-saldo/exportar', [ClienteSemSaldoController::class, 'exportarCsv'])->name('clientes.sem.saldo.exportar');
   Route::get('/logs', [LogViewerController::class, 'index'])->name('logs.index');
   Route::post('/logs/clear', [LogViewerController::class, 'clear'])->name('logs.clear');
+});
+
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+  Route::resource('users', UserController::class);
 });
 
 require __DIR__.'/auth.php';
