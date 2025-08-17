@@ -5,6 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\CheckPrioraToken;
 use App\Http\Middleware\CheckNewCorbanToken;
+use \App\Http\Middleware\RoleMiddleware;
 use Illuminate\Console\Scheduling\Schedule;
 
 $oApp = Application::configure(basePath: dirname(__DIR__))
@@ -16,6 +17,7 @@ $oApp = Application::configure(basePath: dirname(__DIR__))
     $middleware->alias([
       'check.priora' => CheckPrioraToken::class,
       'check.newcorban.token' => CheckNewCorbanToken::class,
+      'role' => RoleMiddleware::class,
     ]);
   })
   ->withExceptions(function (Exceptions $exceptions) {
